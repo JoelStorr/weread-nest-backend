@@ -2,39 +2,116 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
+import { UserErrors } from 'lib/error.types';
 
 @Injectable()
 export class UserService {
+  constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
-    constructor(@InjectRepository(User) private repo: Repository<User>){}
+  async createUser(
+    username: string,
+    email: string,
+    hashedPassword: string,
+  ): Promise<number | null> {
+    let user: number;
+
+    username = username.toLowerCase();
+
+    try {
+      user = await this.repo.query(
+        'INSERT INTO user (email, password, username) VALUES (?,?,?)',
+        [email, hashedPassword, username],
+      );
+    } catch (error) {
+      console.log(error.driverError);
+
+      if (error.driverError.code === 'SQLITE_CONSTRAINT') {
+        console.log('error triggered');
+        throw new ConflictException('Username or Email are already taken');
+      }
+
+      throw new ConflictException('Something went wrong');
+    }
+
+    return user;
+  }
 
 
-    async createUser(username: string, email: string, hashedPassword: string):Promise<number|null>{
+  async findUserById(id: number){
 
-        let user:number;
+    let user: User[];
 
-        try{
+    try{
+        user = await this.repo.query("SELECT * FROM user WHERE id=?", [id])
 
-            user = await this.repo.query("INSERT INTO user (email, password, username) VALUES (?,?,?)", [email, hashedPassword, username])
-        } catch(error){
-
-            console.log(error.driverError);
-
-            if (error.driverError.code === 'SQLITE_CONSTRAINT') {
-                console.log('error triggered');
-            }
-            
-            throw new ConflictException("Username or Email are already taken")
+        if(user.length === 0){
+            throw new Error(UserErrors.lengthOfZero);
         }
 
+        if(user.length > 1){
+            throw new Error(UserErrors.lengthOverOne);
+        }
 
+    }catch (error){
+        console.log(error)
 
-        return user;
-
-
+        throw new ConflictException('Could not find the user you are looking for');
 
     }
 
+    return user[0]
+  }
 
+
+  async findUserByName(username: string){
+
+    let user: User[];
+
+    try {
+      user = await this.repo.query('SELECT * FROM user WHERE username=?', [username]);
+        
+
+      if (user.length === 0) {
+        throw new Error(UserErrors.lengthOfZero);
+      }
+
+      if (user.length > 1) {
+        throw new Error(UserErrors.lengthOverOne);
+      }
+    } catch (error) {
+      console.log(error);
+
+      throw new ConflictException(
+        'Could not find the user you are looking for',
+      );
+    }
+
+    return user[0];
+  }
+
+  async findUserByEmail(email: string){
+
+    let user: User[];
+
+    try {
+      user = await this.repo.query('SELECT * FROM user WHERE email=?', [email]);
+
+      if (user.length === 0) {
+        throw new Error(UserErrors.lengthOfZero);
+      }
+
+      if (user.length > 1) {
+        throw new Error(UserErrors.lengthOverOne);
+      }
+    } catch (error) {
+      console.log(error);
+
+      throw new ConflictException(
+        'Could not find the user you are looking for',
+      );
+    }
+
+    return user[0];
+  }
 
 }
