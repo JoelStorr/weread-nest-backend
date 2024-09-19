@@ -3,9 +3,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [UserModule, AuthModule],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: "sqlite",
+      database: "db.sqlite",
+      entities: [],
+      synchronize: true,
+    }),
+    UserModule, AuthModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
