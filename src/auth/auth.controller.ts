@@ -1,29 +1,38 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { AuthService } from './auth.service';
+import { SigninNameDto } from './dtos/signinName.dto';
+import { SigninEmailDto } from './dtos/signinEmail.dto';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private authService: AuthService) {}
 
-    constructor(private autService: AuthService){}
+  @Post('/register')
+  async signup(@Body() body: RegisterDto) {
+    const user = await this.authService.createUser(
+      body.username,
+      body.email,
+      body.password,
+    );
+    console.log(user);
+    return user;
+  }
 
-    @Post("/register")
-    async signup(@Body() body: RegisterDto){
-        
-        
+  //TODO: Build interceptor to remove password from return data
 
-        const user = await this.autService.createUser(body.username, body.email, body.password);
-        console.log(user);
-        return user;
+  @Post('/signinname')
+  async signinName(@Body() body: SigninNameDto) {
+    return await this.authService.signInUserViaName(
+      body.username,
+      body.password,
+    );
+  }
 
-    }
+  @Post('/signinemail')
+  async signinEmail(@Body() body: SigninEmailDto) {
+    return await this.authService.signInUserViaEmail(body.email, body.password);
+  }
 
-
-    @Post("/signin")
-    async signin(){
-
-    }
-
-
-    //TODO: Handle re authentication
+  //TODO: Handle re authentication
 }

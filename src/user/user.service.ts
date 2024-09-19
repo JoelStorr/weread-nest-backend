@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -36,40 +40,11 @@ export class UserService {
     return user;
   }
 
-
-  async findUserById(id: number){
-
-    let user: User[];
-
-    try{
-        user = await this.repo.query("SELECT * FROM user WHERE id=?", [id])
-
-        if(user.length === 0){
-            throw new Error(UserErrors.lengthOfZero);
-        }
-
-        if(user.length > 1){
-            throw new Error(UserErrors.lengthOverOne);
-        }
-
-    }catch (error){
-        console.log(error)
-
-        throw new ConflictException('Could not find the user you are looking for');
-
-    }
-
-    return user[0]
-  }
-
-
-  async findUserByName(username: string){
-
+  async findUserById(id: number) {
     let user: User[];
 
     try {
-      user = await this.repo.query('SELECT * FROM user WHERE username=?', [username]);
-        
+      user = await this.repo.query('SELECT * FROM user WHERE id=?', [id]);
 
       if (user.length === 0) {
         throw new Error(UserErrors.lengthOfZero);
@@ -81,7 +56,7 @@ export class UserService {
     } catch (error) {
       console.log(error);
 
-      throw new ConflictException(
+      throw new NotFoundException(
         'Could not find the user you are looking for',
       );
     }
@@ -89,8 +64,33 @@ export class UserService {
     return user[0];
   }
 
-  async findUserByEmail(email: string){
+  async findUserByName(username: string) {
+    let user: User[];
 
+    try {
+      user = await this.repo.query('SELECT * FROM user WHERE username=?', [
+        username,
+      ]);
+
+      if (user.length === 0) {
+        throw new Error(UserErrors.lengthOfZero);
+      }
+
+      if (user.length > 1) {
+        throw new Error(UserErrors.lengthOverOne);
+      }
+    } catch (error) {
+      console.log(error);
+
+      throw new NotFoundException(
+        'Could not find the user you are looking for',
+      );
+    }
+
+    return user[0];
+  }
+
+  async findUserByEmail(email: string) {
     let user: User[];
 
     try {
@@ -106,12 +106,11 @@ export class UserService {
     } catch (error) {
       console.log(error);
 
-      throw new ConflictException(
+      throw new NotFoundException(
         'Could not find the user you are looking for',
       );
     }
 
     return user[0];
   }
-
 }
