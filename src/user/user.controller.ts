@@ -1,7 +1,12 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
+import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { User } from './user.entity';
+import { AuthGuard } from 'src/guards/auth.guards';
 
 @Controller('user')
+
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -21,4 +26,12 @@ export class UserController {
   async getUserByEmail(@Param('email') email: string) {
     return await this.userService.findUserByEmail(email);
   }
+
+
+  @Get("whoAmI")
+  @UseGuards(AuthGuard)
+  whoAmI(@CurrentUser() user: User){
+    return user;
+  }
+
 }

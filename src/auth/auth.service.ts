@@ -26,11 +26,13 @@ export class AuthService {
 
     const hashedAndSalted = salt + '.' + hash.toString('hex');
 
-    const user = await this.userService.createUser(
+    const userId = await this.userService.createUser(
       username,
       email,
       hashedAndSalted,
     );
+
+    const user = await this.userService.findUserById(userId);
 
     return user;
   }
