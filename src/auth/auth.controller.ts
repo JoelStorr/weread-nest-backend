@@ -9,9 +9,12 @@ export class AuthController {
 
     @Post("/register")
     async signup(@Body() body: RegisterDto){
-        console.log(body)
+        
+        
 
-        return body;
+        const user = await this.autService.createUser(body.username, body.email, body.password);
+        console.log(user);
+        return user;
 
     }
 
