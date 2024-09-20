@@ -5,13 +5,11 @@ import {
   Session,
   Get,
   Request,
-  UseGuards,
 } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { AuthService } from './auth.service';
 import { SigninNameDto } from './dtos/signinName.dto';
 import { SigninEmailDto } from './dtos/signinEmail.dto';
-import { AuthGuard } from './auth.guards';
 import { Public } from 'src/decorators/public.decorator';
 
 @Controller('auth')
