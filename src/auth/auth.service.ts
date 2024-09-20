@@ -38,7 +38,11 @@ export class AuthService {
 
     const user = await this.userService.findUserById(userId);
 
-    return user;
+     const payload = { sub: user.id, username: user.username };
+
+     return {
+       access_token: await this.jwtService.signAsync(payload),
+     };
   }
 
   async signInUserViaName(username: string, password: string) {
@@ -73,6 +77,10 @@ export class AuthService {
       throw new BadRequestException('Wrong Password');
     }
 
-    return user;
+     const payload = { sub: user.id, username: user.username };
+
+     return {
+       access_token: await this.jwtService.signAsync(payload),
+     };
   }
 }

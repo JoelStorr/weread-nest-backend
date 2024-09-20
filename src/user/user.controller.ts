@@ -1,9 +1,7 @@
 import { Controller, Get, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
-import { CurrentUser } from './decorators/current-user.decorator';
-import { User } from './user.entity';
-import { AuthGuard } from 'src/guards/auth.guards';
+
+
 
 @Controller('user')
 
@@ -28,10 +26,6 @@ export class UserController {
   }
 
 
-  @Get("whoAmI")
-  @UseGuards(AuthGuard)
-  whoAmI(@CurrentUser() user: User){
-    return user;
-  }
+ 
 
 }
