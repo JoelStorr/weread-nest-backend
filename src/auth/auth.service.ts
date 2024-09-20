@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { UserService } from 'src/user/user.service';
 import { promisify } from 'util';
@@ -11,7 +12,10 @@ const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
 
   async createUser(username: string, email: string, password: string) {
     //TODO: Hash the users password
@@ -50,7 +54,12 @@ export class AuthService {
       throw new BadRequestException('Wrong Password');
     }
 
-    return user;
+    //NOTE: First signin Function that works based on JWT Token authentication
+    const payload = { sub: user.id, username: user.username };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 
   async signInUserViaEmail(email: string, password: string) {

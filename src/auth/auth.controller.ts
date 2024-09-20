@@ -1,13 +1,18 @@
-import { Body, Controller, Post, Session } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Request, UseGuards } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { AuthService } from './auth.service';
 import { SigninNameDto } from './dtos/signinName.dto';
 import { SigninEmailDto } from './dtos/signinEmail.dto';
+import { AuthGuard } from './auth.guards';
+import { Public } from 'src/decorators/public.decorator';
+
 
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,    
+  ) {}
 
   @Post('/register')
   async signup(@Body() body: RegisterDto, @Session() session: any) {
@@ -23,7 +28,7 @@ export class AuthController {
   }
 
   //TODO: Build interceptor to remove password from return data
-
+  @Public()
   @Post('/signinname')
   async signinName(@Body() body: SigninNameDto, @Session() session: any) {
     const user = await this.authService.signInUserViaName(
@@ -31,9 +36,9 @@ export class AuthController {
       body.password,
     );
 
-    session.userId = user.id;
-
+    // NOTE: Right now returns just the token
     return user;
+    
   }
 
   @Post('/signinemail')
@@ -51,5 +56,11 @@ export class AuthController {
   @Post("/signout")
   signOut(@Session() session:any){
     session.userId = null;
+  }
+
+  @UseGuards(AuthGuard)
+  @Get("/whoami")
+  whoAmI(@Request() req){
+    return req.user;
   }
 }
