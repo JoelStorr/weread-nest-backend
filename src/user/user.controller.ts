@@ -1,10 +1,14 @@
-import { Controller, Get, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 
-
-
 @Controller('user')
-
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -24,8 +28,4 @@ export class UserController {
   async getUserByEmail(@Param('email') email: string) {
     return await this.userService.findUserByEmail(email);
   }
-
-
- 
-
 }

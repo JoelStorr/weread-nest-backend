@@ -1,4 +1,3 @@
-
 //TODO: Change Secret Key to env variable
 export const jwtConstants = {
   secret:
