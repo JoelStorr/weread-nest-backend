@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Request } from '@nestjs/common';
 import { ListsService } from './lists.service';
 import { newListDto } from './dtos/newList.dto';
 
@@ -18,12 +18,23 @@ export class ListsController {
 
     @Post("/createlist")
     async createList(@Body() body:newListDto, @Request() req: any ){
+        const userId = req.user.sub;
+        const listId = await this.listsService.createList(userId, body.name, body.privateList);
+        return listId;
+    }
+
+
+    @Delete("/:id")
+    async deleteList(@Param("id") id: string, @Request() req:any){
 
         const userId = req.user.sub;
 
-        const listId = await this.listsService.createList(userId, body.name, body.privateList);
+        let numId = Number(id)
 
-        return listId;
+        const deletedListId = await this.listsService.deleteList(userId, numId);
+
+        return deletedListId;
+
     }
 
 }
