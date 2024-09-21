@@ -7,10 +7,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { UserErrors } from 'lib/error.types';
+import { ListsService } from 'src/lists/lists.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private repo: Repository<User>,
+    private listsService: ListsService
+  ) {}
 
   async createUser(
     username: string,
@@ -18,6 +22,7 @@ export class UserService {
     hashedPassword: string,
   ): Promise<number | null> {
     let user: number;
+    let insertedLists: number[];
 
     username = username.toLowerCase();
 
@@ -26,6 +31,10 @@ export class UserService {
         'INSERT INTO user (email, password, username) VALUES (?,?,?)',
         [email, hashedPassword, username],
       );
+
+      insertedLists = await this.listsService.createDefaultLists(user);
+
+
     } catch (error) {
       console.log(error.driverError);
 

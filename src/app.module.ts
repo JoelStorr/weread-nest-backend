@@ -11,6 +11,7 @@ import { ListsModule } from './lists/lists.module';
 import { List } from './lists/list.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { ListsService } from './lists/lists.service';
 
 @Module({
   imports: [
@@ -35,6 +36,6 @@ import { JwtService } from '@nestjs/jwt';
     UserModule, AuthModule, ListsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UserService, AuthService, JwtService],
+  providers: [AppService, UserService, AuthService, JwtService, ListsService],
 })
 export class AppModule {}
