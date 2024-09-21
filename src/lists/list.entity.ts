@@ -9,6 +9,9 @@ export class List {
   @Column()
   name: string;
 
+  @Column({default: true})
+  privateList: boolean;
+
   @ManyToOne(()=>User, (user)=>user.lists)
   user: User;
 }
